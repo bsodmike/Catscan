@@ -20,32 +20,27 @@ module Catscan
 
     end
 
-    let(:subject) { Patient.new }
+    let(:subject) { Patient }
 
-    it "should respond to #scan" do
+    it "should respond to ::scan" do
       expect(subject.respond_to? :scan).to be
     end
 
-    it "should respond to ::scan" do
-      expect(Patient.respond_to? :scan).to be
-    end
+    context "when scanning within an instance or class method" do
 
-
-    context "when extended to scan within an instance or class method" do
-
-      it "should " do
+      it "should return the value of the block passed to ::scan" do
         Patient.class_eval do
           def instance_scan
-            scan self do
+            self.class.scan self do
               name
             end
           end
         end
 
-        expect(subject.instance_scan).to eq("Batman")
+        expect(subject.new.instance_scan).to eq("Batman")
       end
 
-      it "should " do
+      it "should return the value of the block passed to ::scan" do
         Patient.class_eval do
           class << self
 
@@ -58,27 +53,27 @@ module Catscan
           end
         end
 
-        expect(Patient.class_scan).to eq("Bruce Wayne")
+        expect(subject.class_scan).to eq("Bruce Wayne")
       end
 
     end
 
-    context "when an exception is raised" do
+    context "when an exception is raised within the block passed to ::scan" do
 
-      it "should " do
+      it "should raise the exception" do
         Patient.class_eval do
           def instance_scan
-            scan self do
+            self.class.scan self do
               raise StandardError
             end
           end
         end
 
         subject.expects(:puts).with "Error!"
-        expect {subject.instance_scan}.to raise_error(StandardError)
+        expect {subject.new.instance_scan}.to raise_error(StandardError)
       end
 
-      it "should " do
+      it "should raise the exception" do
         Patient.class_eval do
           class << self
             def class_scan
@@ -89,8 +84,8 @@ module Catscan
           end
         end
 
-        Patient.expects(:puts).with "Error!"
-        expect {Patient.class_scan}.to raise_error(StandardError)
+        subject.expects(:puts).with "Error!"
+        expect {subject.class_scan}.to raise_error(StandardError)
       end
     end
 

@@ -6,13 +6,12 @@ module Catscan
     class << self
       def included _klass
         _klass.class_eval do
-          _klass.send(:include, ScannerMethods)
-          _klass.send(:extend, ScannerMethods)
+          _klass.send(:extend, ClassMethods)
         end
       end
     end
 
-    module ScannerMethods
+    module ClassMethods
 
       def scan(context, comment = nil, &block)
         klass_name = context.class.name

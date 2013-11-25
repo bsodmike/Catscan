@@ -15,15 +15,13 @@ module Catscan
     module ScannerMethods
 
       def scan(context, comment = nil, &block)
-        result = nil
-
         klass_name = context.class.name
         comment = Util.limit_bytesize(comment) if comment.present?
 
         ActiveSupport::Notifications.instrument("log.scan",
           :klass_name => klass_name,
           :comment => "#{klass_name}: #{comment}") do
-          result = context.instance_eval(&block)
+          context.instance_eval(&block)
         end
       rescue => ex
         puts "Error!"

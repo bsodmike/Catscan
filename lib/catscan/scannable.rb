@@ -6,42 +6,39 @@ module Catscan
     class << self
       def included _klass
         _klass.class_eval do
-          _klass.send(:include, InstanceMethods)
-          _klass.send(:include, CommonMethods)
-          _klass.send(:extend, CommonMethods)
-          _klass.send(:extend, ClassMethods)
+          _klass.send(:include, ScannerMethods)
+          _klass.send(:extend, ScannerMethods)
         end
       end
     end
 
-    module InstanceMethods
-
-    end
-
-    module CommonMethods
+    module ScannerMethods
 
       def scan(context, comment = nil, &block)
         result = nil
 
         klass_name = context.class.name
-        #comment = Util.limit_bytesize(message)
+        comment = Util.limit_bytesize(comment) if comment.present?
 
-        ActiveSupport::Notifications.instrument("log.scan", :comment => "#{klass_name}: #{comment}") do
+        ActiveSupport::Notifications.instrument("log.scan",
+          :klass_name => klass_name,
+          :comment => "#{klass_name}: #{comment}") do
           result = context.instance_eval(&block)
         end
       rescue => ex
-        puts "Logging Error!"
+        puts "Error!"
+
+        # NOTE Re-raise exception for spec purposes
+        raise if Rails.env.test?
+
         ActiveSupport::Notifications.instrument("log.scan",
+          :klass_name => klass_name,
           :comment => "ERROR: #{klass_name}: #{comment}",
           :error_message => "#{ex.message}",
           :error_class => "#{ex.class}",
           :error_backtrace => "#{ex.backtrace}"
         )
       end
-
-    end
-
-    module ClassMethods
 
     end
 

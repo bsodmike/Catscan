@@ -14,7 +14,7 @@ module Catscan
     module ClassMethods
 
       def scan(context, comment = nil, &block)
-        klass_name = context.class.name
+        klass_name = %w(Class).include?(context.class.name) ? context.name : context.class.name
         comment = Util.limit_bytesize(comment) if comment.present?
 
         ActiveSupport::Notifications.instrument("log.scan",

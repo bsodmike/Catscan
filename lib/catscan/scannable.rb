@@ -1,4 +1,5 @@
 # encoding: utf-8
+require 'catscan/util'
 
 module Catscan
   module Scannable
@@ -13,13 +14,15 @@ module Catscan
 
     module ClassMethods
 
-      def scan(context, comment = nil, &block)
+      def scan(context, entity = nil, comment = nil, category = :default, &block)
         klass_name = %w(Class).include?(context.class.name) ? context.name : context.class.name
-        comment = Util.limit_bytesize(comment) if comment.present?
+        comment = Util.limit_bytesize(comment.force_encoding("UTF-8")) if comment.present?
 
         ActiveSupport::Notifications.instrument("log.scan",
-          :klass_name => klass_name,
-          :comment => "#{klass_name}: #{comment}") do
+          :klass_name       => klass_name,
+          :entity           => entity.present? ? "#{entity}" : nil,
+          :comment          => comment.present? ? "#{comment}" : nil,
+          :category         => "#{category}") do
           context.instance_eval(&block)
         end
       rescue => ex
@@ -29,11 +32,13 @@ module Catscan
         raise if Rails.env.test?
 
         ActiveSupport::Notifications.instrument("log.scan",
-          :klass_name => klass_name,
-          :comment => "ERROR: #{klass_name}: #{comment}",
-          :error_message => "#{ex.message}",
-          :error_class => "#{ex.class}",
-          :error_backtrace => "#{ex.backtrace}"
+          :klass_name       => klass_name,
+          :entity           => entity.present? ? "#{entity}" : nil,
+          :comment          => comment.present? ? "ERROR: #{comment}" : nil,
+          :category         => "#{category}",
+          :error_message    => "#{ex.message}",
+          :error_class      => "#{ex.class}",
+          :error_backtrace  => "#{ex.backtrace}"
         )
       end
 

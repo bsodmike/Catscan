@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Michael de Silva"]
   spec.email         = ["michael@mwdesilva.com"]
   spec.homepage      = "http://mwdesilva.com"
-  spec.summary       = "A"
+  spec.summary       = "A Catscanner for your Rails apps!"
   spec.description   = spec.summary
   spec.license       = "MIT"
 

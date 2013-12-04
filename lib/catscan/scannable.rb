@@ -18,12 +18,21 @@ module Catscan
         klass_name = %w(Class).include?(context.class.name) ? context.name : context.class.name
         comment = Util.limit_bytesize(comment.force_encoding("UTF-8")) if comment.present?
 
-        ActiveSupport::Notifications.instrument("log.scan",
-          :klass_name       => klass_name,
-          :entity           => entity.present? ? "#{entity}" : nil,
-          :comment          => comment.present? ? "#{comment}" : nil,
-          :category         => "#{category}") do
-          context.instance_eval(&block)
+        if block_given?
+          ActiveSupport::Notifications.instrument("log.scan",
+            :klass_name       => klass_name,
+            :entity           => entity.present? ? "#{entity}" : nil,
+            :comment          => comment.present? ? "#{comment}" : nil,
+            :category         => "#{category}") do
+            context.instance_eval(&block)
+          end
+        else
+          ActiveSupport::Notifications.instrument("log.scan",
+            :klass_name       => klass_name,
+            :entity           => entity.present? ? "#{entity}" : nil,
+            :comment          => comment.present? ? "#{comment}" : nil,
+            :category         => "#{category}"
+          )
         end
       rescue => ex
         puts "Error!"

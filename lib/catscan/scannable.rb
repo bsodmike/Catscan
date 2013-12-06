@@ -37,9 +37,6 @@ module Catscan
       rescue => ex
         puts "Error!"
 
-        # NOTE Re-raise exception for spec purposes
-        raise if Rails.env.test?
-
         ActiveSupport::Notifications.instrument("log.scan",
           :klass_name       => klass_name,
           :entity           => entity.present? ? "#{entity}" : nil,
@@ -49,6 +46,8 @@ module Catscan
           :error_class      => "#{ex.class}",
           :error_backtrace  => "#{ex.backtrace}"
         )
+
+        raise
       end
 
     end

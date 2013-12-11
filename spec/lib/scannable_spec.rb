@@ -89,5 +89,15 @@ module Catscan
       end
     end
 
+    context "when included into a module" do
+      it "should respond to `:scan` as a class method" do
+        module M
+          include Catscan::Scannable
+        end
+
+        expect(M.respond_to? :scan).to be
+      end
+    end
+
   end
 end

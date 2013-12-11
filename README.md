@@ -1,5 +1,6 @@
-# Catscan ~ A Catscanner for your Rails apps!
+# Catscan
 
+**A Catscanner for your Rails apps!** &mdash; allows you to 'scan' through your codebase by hooking into [Rails's `ActiveSupport::Notifications` API](http://api.rubyonrails.org/classes/ActiveSupport/Notifications.html).
 
 ## Installation
 
@@ -14,6 +15,11 @@ And then execute:
 Or install it yourself as:
 
     $ gem install catscan
+
+Finally, install and run migrations:
+
+    $ rake catscan:install:migrations
+    $ rake db:migrate
 
 ## API Summary
 
@@ -35,6 +41,23 @@ namespace :foo do
   end
 end
 ```
+
+Within classes, simply include the `Scannable` mixin which will setup
+`scan` as a class method, i.e. `Client.scan`.  In the following example,
+a call to `Client.first.name` would `scan` and persist the `:name`
+attribute of `Client`.
+
+```ruby
+class Client
+  include Catscan::Scannable
+
+  def name
+    scan self, "#{name}", "Name, of the client", :client
+    @name
+  end
+end
+```
+
 
 ## Contributing
 

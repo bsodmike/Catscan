@@ -1,4 +1,4 @@
-# Catscan
+# Catscan ~ A Catscanner for your Rails apps!
 
 
 ## Installation
@@ -14,6 +14,27 @@ And then execute:
 Or install it yourself as:
 
     $ gem install catscan
+
+## API Summary
+
+The scanner can be wrapped within a convenience module for usage within
+other modules or, for example, say in a `rake` task.
+
+```ruby
+require 'catscan'
+
+namespace :foo do
+  task :my_task => :environment do
+
+    module RakeScanner
+      include Catscan::Scannable
+    end
+
+    RakeScanner.scan(#...)
+
+  end
+end
+```
 
 ## Contributing
 
